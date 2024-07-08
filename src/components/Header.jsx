@@ -7,7 +7,7 @@ import {
   NavbarToggle,
 } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaMoon, FaSignOutAlt, FaSun, FaUserCheck } from "react-icons/fa";
+import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { Button } from "./ui/moving-border";
@@ -18,6 +18,8 @@ import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 import { IoIosMail } from "react-icons/io";
 import fbLogo from "../assets/logo-facebook.png";
+import SignIn from "../pages/SignIn";
+import { useState } from "react";
 
 function Header() {
   const path = useLocation().pathname;
@@ -25,6 +27,7 @@ function Header() {
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
   const { currentUser } = useSelector((state) => state.user);
+  const [openModal, setOpenModal] = useState(false);
 
   const StyledBadge = styled(Badge)(() => ({
     "& .MuiBadge-badge": {
@@ -58,53 +61,40 @@ function Header() {
     },
   }));
   return (
-    <Navbar
-      fluid
-      className='bg-gray-400 sticky md:top-3 md:mx-14 md:rounded-full opacity-85 z-40'
-    >
-      <NavbarBrand>
-        <Link to='/'>
-          <img
-            src={fbLogo}
-            className='md:ml-10'
-            alt='App Logo'
-            height={50}
-            width={130}
-          />
-        </Link>
-      </NavbarBrand>
-      <div className='flex gap-5 md:order-2 md:pr-10'>
-        <Button
-          borderRadius='1.75rem'
-          className='bg-tansparent text-black dark:text-white border-neutral-200 dark:border-slate-800 w-full h-10 mr-10'
-          onClick={() => dispatch(toggleTheme())}
-        >
-          {theme === "light" ? (
-            <FaSun className='w-5 h-5' />
-          ) : (
-            <FaMoon className='w-5 h-5' />
-          )}
-        </Button>
-        {currentUser ? (
-          <Dropdown
-            arrowIcon={false}
-            inline
-            label={
-              <StyledBadge
-                overlap='circular'
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                variant='dot'
-              >
-                <Avatar
-                  alt={currentUser.username}
-                  src={currentUser.profilePicture}
-                  sx={{ width: 44, height: 44 }}
-                />
-              </StyledBadge>
-            }
+    <>
+      <SignIn openModal={openModal} setOpenModal={setOpenModal} />
+      <Navbar
+        fluid
+        className='bg-gray-400 sticky md:top-3 md:mx-14 md:rounded-full opacity-85 z-40'
+      >
+        <NavbarBrand>
+          <Link to='/'>
+            <img
+              src={fbLogo}
+              className='md:ml-10'
+              alt='App Logo'
+              height={50}
+              width={130}
+            />
+          </Link>
+        </NavbarBrand>
+        <div className='flex gap-5 md:order-2 md:pr-10'>
+          <Button
+            borderRadius='1.75rem'
+            className='bg-tansparent text-black dark:text-white border-neutral-200 dark:border-slate-800 w-full h-10 mr-10'
+            onClick={() => dispatch(toggleTheme())}
           >
-            <Dropdown.Header>
-              <div className='flex justify-center items-center gap-2'>
+            {theme === "light" ? (
+              <FaSun className='w-5 h-5' />
+            ) : (
+              <FaMoon className='w-5 h-5' />
+            )}
+          </Button>
+          {currentUser ? (
+            <Dropdown
+              arrowIcon={false}
+              inline
+              label={
                 <StyledBadge
                   overlap='circular'
                   anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -113,62 +103,78 @@ function Header() {
                   <Avatar
                     alt={currentUser.username}
                     src={currentUser.profilePicture}
-                    sx={{ width: 60, height: 60 }}
+                    sx={{ width: 44, height: 44 }}
                   />
                 </StyledBadge>
-
-                <span className='block text-md font-bold text-blue-500 truncate'>
-                  @{currentUser.username}
-                </span>
-              </div>
-              <span className='text-sm font-medium text-gray-500 dark:text-gray-400 truncate mt-2 flex justify-center items-center gap-1'>
-                <IoIosMail className='w-6 h-6 pt-1' />
-                {currentUser.email}
-              </span>
-            </Dropdown.Header>
-
-            <Link to={"/dashboard?tab=dash"}>
-              <Dropdown.Item className='text-blue-500 font-semibold'>
-                <ImProfile className='w-4 h-4 mr-2' color='blue' />
-                Dashboard
-              </Dropdown.Item>
-            </Link>
-
-            <Dropdown.Divider />
-
-            <Dropdown.Item
-              className='text-red-500 font-semibold'
-              onClick={() => {
-                dispatch(signoutSuccess());
-                navigate("/");
-              }}
+              }
             >
-              <FaSignOutAlt className='w-4 h-4 mr-2' color='red' />
-              Sign out
-            </Dropdown.Item>
-          </Dropdown>
-        ) : (
-          <Button
-            borderRadius='1.75rem'
-            className='bg-transparent border-slate-800 mr-4 text-sm font-semibold text-black dark:text-white'
-            onClick={() => navigate("/sign-in")}
-          >
-            Sign In
-          </Button>
-        )}
+              <Dropdown.Header>
+                <div className='flex justify-center items-center gap-2'>
+                  <StyledBadge
+                    overlap='circular'
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant='dot'
+                  >
+                    <Avatar
+                      alt={currentUser.username}
+                      src={currentUser.profilePicture}
+                      sx={{ width: 60, height: 60 }}
+                    />
+                  </StyledBadge>
 
-        <NavbarToggle />
-      </div>
-      <NavbarCollapse>
-        <NavbarLink active={path === "/"} as={"div"}>
-          <Link to='/'>Home</Link>
-        </NavbarLink>
+                  <span className='block text-md font-bold text-blue-500 truncate'>
+                    @{currentUser.username}
+                  </span>
+                </div>
+                <span className='text-sm font-medium text-gray-500 dark:text-gray-400 truncate mt-2 flex justify-center items-center gap-1'>
+                  <IoIosMail className='w-6 h-6 pt-1' />
+                  {currentUser.email}
+                </span>
+              </Dropdown.Header>
 
-        <NavbarLink active={path === "/contact"} as={"div"}>
-          <Link to='/contact'>Contact Us</Link>
-        </NavbarLink>
-      </NavbarCollapse>
-    </Navbar>
+              <Link to={"/dashboard?tab=dash"}>
+                <Dropdown.Item className='text-blue-500 font-semibold'>
+                  <ImProfile className='w-4 h-4 mr-2' color='blue' />
+                  Dashboard
+                </Dropdown.Item>
+              </Link>
+
+              <Dropdown.Divider />
+
+              <Dropdown.Item
+                className='text-red-500 font-semibold'
+                onClick={() => {
+                  dispatch(signoutSuccess());
+                  navigate("/");
+                }}
+              >
+                <FaSignOutAlt className='w-4 h-4 mr-2' color='red' />
+                Sign out
+              </Dropdown.Item>
+            </Dropdown>
+          ) : (
+            <Button
+              borderRadius='1.75rem'
+              className='bg-transparent border-slate-800 mr-4 text-sm font-semibold text-black dark:text-white'
+              onClick={() => setOpenModal(true)}
+            >
+              Sign In
+            </Button>
+          )}
+
+          <NavbarToggle />
+        </div>
+        <NavbarCollapse>
+          <NavbarLink active={path === "/"} as={"div"}>
+            <Link to='/'>Home</Link>
+          </NavbarLink>
+
+          <NavbarLink active={path === "/contact"} as={"div"}>
+            <Link to='/contact'>Contact Us</Link>
+          </NavbarLink>
+        </NavbarCollapse>
+      </Navbar>
+    </>
   );
 }
 
